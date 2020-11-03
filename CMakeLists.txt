@@ -1,5 +1,5 @@
 # Version CMake
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.10)
 
 # Project name
 project(weather-station-server VERSION 1.0.9)
@@ -10,7 +10,6 @@ configure_file(
 
 # Option
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 # Compiler-specific options
 if((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
@@ -28,8 +27,6 @@ if((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clan
         -Wredundant-decls
         -Wsign-promo
     )
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    add_compile_options(/W4 /WX)
 endif()
 
 # Source files
@@ -38,6 +35,11 @@ file(GLOB_RECURSE SOURCES
     source/*.h
     source/utils/*.h
 )
+
+# Set build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_BUILD_TYPE)
 
 # Compiling target
 add_executable(${PROJECT_NAME} ${SOURCES})
