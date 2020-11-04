@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <iostream>
 
-
 Handler::Handler(Server& server,
     Client& client,
     std::vector<config::Server>& serverConfig,

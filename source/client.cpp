@@ -1,6 +1,6 @@
 
-#include <include/client.h>
 #include <cstdio>
+#include <include/client.h>
 #include <iostream>
 
 Client::Client(config::Net& config)

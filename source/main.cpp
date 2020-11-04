@@ -7,7 +7,6 @@
 #include <project_version.h>
 #include <string>
 
-
 std::string parseCommand(int argc, char* argv[])
 {
     for (int i = 0; i < argc; ++i) {
