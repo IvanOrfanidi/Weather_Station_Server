@@ -48,7 +48,10 @@ pipeline {
             steps {
                 script {
                     VERSION = sh( returnStdout: true, script: "build/${EXECUTABLE_FILE_NAME} -v" ).trim()
-                    sh "zip build/${EXECUTABLE_FILE_NAME}-${VERSION}.zip build/${EXECUTABLE_FILE_NAME}.exe build/${EXECUTABLE_FILE_NAME} build/*.cfg"
+                    sh 'git clone http://192.168.109.15/root/configuration_of_weather_station_server.git'
+                    sh 'mkdir build/config'
+                    sh 'cp -r configuration_of_weather_station_server/*.cfg build/config/'
+                    sh "zip build/${EXECUTABLE_FILE_NAME}-${VERSION}.zip build/${EXECUTABLE_FILE_NAME}.exe build/${EXECUTABLE_FILE_NAME} build/config/*.cfg"
                 }
             }
         }
