@@ -13,7 +13,7 @@ Server::Server(config::Net& config)
         throw e;
     }
 
-    _thr = std::thread(&Server::execute, this);
+    _thread = std::thread(&Server::execute, this);
 }
 
 void Server::receiveData(std::vector<char>& data)
@@ -58,7 +58,7 @@ void Server::execute()
         }
 
         if (!data.empty()) {
-            // Copy data
+            // Копируем данные
             _data.push(data);
             data.clear();
         }

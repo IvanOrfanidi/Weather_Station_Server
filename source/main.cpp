@@ -10,7 +10,9 @@
 std::string parseCommand(int argc, char* argv[])
 {
     for (int i = 0; i < argc; ++i) {
-        std::string arg = argv[i];
+        const std::string arg = argv[i];
+
+        // Запрос на версию ПО
         if (arg == "-v" || arg == "--version") {
             return PROJECT_VERSION;
         }
@@ -20,13 +22,15 @@ std::string parseCommand(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
+    // Парсер команд при старте
     const auto msgOut = parseCommand(argc, argv);
     if (msgOut.length()) {
         std::cout << msgOut << std::endl;
         return EXIT_SUCCESS;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(60 * 1000));
+    // Таймаут на запуск при старте устройства
+    std::this_thread::sleep_for(std::chrono::minutes(1));
 
     auto& config = Config::getInstance();
     Server server(config.getNetServerConfig());
@@ -38,9 +42,11 @@ int main(int argc, char* argv[])
         config.getSizeBuffer());
 
     try {
+        // Главный цикл выполнения
         handler.execute();
     } catch (const std::exception& e) {
         return EXIT_FAILURE;
     }
+
     return EXIT_SUCCESS;
 }

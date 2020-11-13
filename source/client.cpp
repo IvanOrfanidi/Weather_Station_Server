@@ -8,7 +8,7 @@ Client::Client(config::Net& config)
     , _sizeBuffer(config.sizeBuffer)
     , _timeoutReset(config.timeoutReset)
 {
-    _thr = std::thread(&Client::execute, this);
+    _thread = std::thread(&Client::execute, this);
 }
 
 void Client::sendData(std::vector<char>& data)
@@ -32,7 +32,7 @@ void Client::execute()
                 std::this_thread::sleep_for(std::chrono::milliseconds(_timeoutReset));
             }
 
-            // Sendinng data and Receive answer
+            // Отправляем данные и принимаем подтверждение
             try {
                 _client.send(data);
                 data.clear();

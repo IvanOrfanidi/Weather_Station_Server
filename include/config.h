@@ -44,6 +44,10 @@ public:
     std::vector<config::Client>& getClientConfig() noexcept;
 
     size_t getSizeBuffer() const noexcept;
+    static constexpr std::string_view CONFIGURATION_DIRECTORY = "config/";
+    static constexpr std::string_view NAME_CONFIGURATION_FILE = "config.cfg";
+    static constexpr std::string_view NAME_SERVER_CONFIGURATION_FILE = "server.cfg";
+    static constexpr std::string_view NAME_CLIENT_CONFIGURATION_FILE = "client.cfg";
 
 private:
     void openConfigFile(const char* nameFile, config::Net& server, config::Net& client);
@@ -51,6 +55,8 @@ private:
     void openServerFile(const char* nameFile, std::vector<config::Server>& config);
 
     void openClientFile(const char* nameFile, std::vector<config::Client>& config);
+
+    std::string getCurrentWorkDir() const;
 
     std::vector<config::Server> _server;
     std::vector<config::Client> _client;

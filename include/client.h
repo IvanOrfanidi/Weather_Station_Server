@@ -20,5 +20,5 @@ private:
     threadsafe_queue<std::vector<char>> _data;
     size_t _sizeBuffer;
     unsigned _timeoutReset;
-    std::thread _thr;
+    std::thread _thread;
 };

@@ -15,36 +15,17 @@ const std::string OPEN_CLIENT_FILE = "opening client configuration file";
 
 Config::Config()
 {
-    const std::string NAME_CONFIGURATION_FILE = "config.cfg";
-    const std::string NAME_SERVER_CONFIGURATION_FILE = "server.cfg";
-    const std::string NAME_CLIENT_CONFIGURATION_FILE = "client.cfg";
+    // Получаем директорию где находится бинарник
+    const std::string currentWorkDir = getCurrentWorkDir();
 
-    std::string path;
-    constexpr size_t PATH_SIZE = 1024;
-    path.resize(PATH_SIZE);
-#if defined(__unix__)
-    size_t pos = readlink("/proc/self/exe", path.data(), PATH_SIZE);
-    path.resize(pos);
-    pos = path.rfind("/");
-    path.resize(++pos);
-#endif
+    // Получаем пути к файлам конфигураций
+    const std::string pathToConfigFile = currentWorkDir + CONFIGURATION_DIRECTORY.data() + NAME_CONFIGURATION_FILE.data();
+    const std::string pathToServerFile = currentWorkDir + CONFIGURATION_DIRECTORY.data() + NAME_SERVER_CONFIGURATION_FILE.data();
+    const std::string pathToClientFile = currentWorkDir + CONFIGURATION_DIRECTORY.data() + NAME_CLIENT_CONFIGURATION_FILE.data();
 
-#if defined(_WIN32)
-    char currentWorkDir[PATH_SIZE];
-    _getcwd(currentWorkDir, sizeof(currentWorkDir));
-    path = std::string(currentWorkDir);
-    path += "\\";
-#endif
-
-    std::string pathFile;
-    pathFile = path + NAME_CONFIGURATION_FILE;
-    openConfigFile(pathFile.data(), _netServer, _netClient);
-
-    pathFile = path + NAME_SERVER_CONFIGURATION_FILE;
-    openServerFile(pathFile.data(), _server);
-
-    pathFile = path + NAME_CLIENT_CONFIGURATION_FILE;
-    openClientFile(pathFile.data(), _client);
+    openConfigFile(pathToConfigFile.data(), _netServer, _netClient);
+    openServerFile(pathToServerFile.data(), _server);
+    openClientFile(pathToClientFile.data(), _client);
 }
 
 void Config::openConfigFile(const char* nameFile, config::Net& server, config::Net& client)
@@ -70,27 +51,27 @@ void Config::openConfigFile(const char* nameFile, config::Net& server, config::N
 
         constexpr size_t NUMBER_CONFIG = 4;
         if (token.size() == NUMBER_CONFIG) {
-            config::Net tempConfig;
+            config::Net configuration;
             if (*token[0].begin() != '#') {
-                tempConfig.addr = token[0];
+                configuration.addr = token[0];
             }
             if (*token[1].begin() != '#') {
-                tempConfig.port = std::stoi(token[1]);
+                configuration.port = std::stoi(token[1]);
             }
             if (*token[2].begin() != '#') {
-                tempConfig.sizeBuffer = std::stoi(token[2]);
+                configuration.sizeBuffer = std::stoi(token[2]);
             }
             if (*token[3].begin() != '#') {
-                tempConfig.timeoutReset = std::stoi(token[3]);
+                configuration.timeoutReset = std::stoi(token[3]);
             }
 
-            if (tempConfig.addr.length() != 0 && tempConfig.port != 0 && tempConfig.sizeBuffer != 0 && tempConfig.timeoutReset != 0) {
+            if (configuration.addr.length() != 0 && configuration.port != 0 && configuration.sizeBuffer != 0 && configuration.timeoutReset != 0) {
                 switch (index) {
                 case 0:
-                    server = tempConfig;
+                    server = configuration;
                     break;
                 case 1:
-                    client = tempConfig;
+                    client = configuration;
                     break;
                 default:
                     file.close();
@@ -131,24 +112,24 @@ void Config::openServerFile(const char* nameFile, std::vector<config::Server>& c
         }
         constexpr size_t NUMBER_SERVER_CONFIG = 3;
         if (token.size() == NUMBER_SERVER_CONFIG) {
-            config::Server tempConfig;
+            config::Server configuration;
             if (*token[0].begin() != '#') {
-                tempConfig.key = token[0];
+                configuration.key = token[0];
             }
             if (*token[1].begin() != '#') {
-                tempConfig.numFields = std::stoi(token[1]);
+                configuration.numFields = std::stoi(token[1]);
             }
             if (*token[2].begin() != '#') {
-                tempConfig.timeUpdate = std::stoi(token[2]);
+                configuration.timeUpdate = std::stoi(token[2]);
             }
 
-            if (!tempConfig.key.empty() && tempConfig.numFields > 0) {
-                std::cout << "SERVER: Key = " << tempConfig.key << "\n"
-                          << "SERVER: Number Fields = " << tempConfig.numFields << "\n"
-                          << "SERVER: Time Update = " << tempConfig.timeUpdate << "\n"
+            if (!configuration.key.empty() && configuration.numFields > 0) {
+                std::cout << "SERVER: Key = " << configuration.key << "\n"
+                          << "SERVER: Number Fields = " << configuration.numFields << "\n"
+                          << "SERVER: Time Update = " << configuration.timeUpdate << "\n"
                           << std::endl;
 
-                config.push_back(tempConfig);
+                config.push_back(configuration);
             }
             std::cout << std::endl;
         }
@@ -178,27 +159,27 @@ void Config::openClientFile(const char* nameFile, std::vector<config::Client>& c
         }
         constexpr size_t NUMBER_CLIENT_CONFIG = 4;
         if (token.size() == NUMBER_CLIENT_CONFIG) {
-            config::Client tempConfig;
+            config::Client configuration;
             if (*token[0].begin() != '#') {
-                tempConfig.sourceKey = token[0];
+                configuration.sourceKey = token[0];
             }
             if (*token[1].begin() != '#') {
-                tempConfig.sourceChannel = std::stoi(token[1]);
+                configuration.sourceChannel = std::stoi(token[1]);
             }
             if (*token[2].begin() != '#') {
-                tempConfig.destinationKey = token[2];
+                configuration.destinationKey = token[2];
             }
             if (*token[3].begin() != '#') {
-                tempConfig.destinationChannel = std::stoi(token[3]);
+                configuration.destinationChannel = std::stoi(token[3]);
             }
-            if (!tempConfig.sourceKey.empty() && tempConfig.sourceChannel > 0 && !tempConfig.destinationKey.empty() && tempConfig.destinationChannel > 0) {
-                std::cout << "CLIENT: Source Key = " << tempConfig.sourceKey << "\n"
-                          << "CLIENT: Source Channel = " << tempConfig.sourceChannel << "\n"
-                          << "CLIENT: Destination Key = " << tempConfig.destinationKey << "\n"
-                          << "CLIENT: Destination Channel = " << tempConfig.destinationChannel
+            if (!configuration.sourceKey.empty() && configuration.sourceChannel > 0 && !configuration.destinationKey.empty() && configuration.destinationChannel > 0) {
+                std::cout << "CLIENT: Source Key = " << configuration.sourceKey << "\n"
+                          << "CLIENT: Source Channel = " << configuration.sourceChannel << "\n"
+                          << "CLIENT: Destination Key = " << configuration.destinationKey << "\n"
+                          << "CLIENT: Destination Channel = " << configuration.destinationChannel
                           << std::endl;
 
-                config.push_back(tempConfig);
+                config.push_back(configuration);
             }
             std::cout << std::endl;
         }
@@ -229,5 +210,28 @@ std::vector<config::Client>& Config::getClientConfig() noexcept
 
 size_t Config::getSizeBuffer() const noexcept
 {
-    return (_netServer.sizeBuffer > _netClient.sizeBuffer) ? _netServer.sizeBuffer : _netClient.sizeBuffer;
+    // Вычисляем размер общего буфера
+    const size_t maxBufferSize = (_netServer.sizeBuffer > _netClient.sizeBuffer) ? _netServer.sizeBuffer : _netClient.sizeBuffer;
+    return maxBufferSize;
+}
+
+std::string Config::getCurrentWorkDir() const
+{
+    std::string path;
+    constexpr size_t PATH_SIZE = 1024;
+    path.resize(PATH_SIZE);
+#if defined(__unix__)
+    size_t pos = readlink("/proc/self/exe", path.data(), PATH_SIZE);
+    path.resize(pos);
+    pos = path.rfind("/");
+    path.resize(++pos);
+#endif
+
+#if defined(_WIN32)
+    char currentWorkDir[PATH_SIZE];
+    _getcwd(currentWorkDir, sizeof(currentWorkDir));
+    path = std::string(currentWorkDir);
+    path += "\\";
+#endif
+    return path;
 }

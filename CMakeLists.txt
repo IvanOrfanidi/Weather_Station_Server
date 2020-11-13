@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(weather-station-server VERSION 1.0.10)
+project(weather-station-server VERSION 1.0.11)
 
 configure_file(
     project_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/project_version.h
