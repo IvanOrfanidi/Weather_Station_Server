@@ -32,8 +32,8 @@ endif()
 # Source files
 file(GLOB_RECURSE SOURCES
     source/*.cpp
-    source/*.h
-    source/utils/*.h
+    include/*.h
+    include/utils/*.h
 )
 
 # Set build type

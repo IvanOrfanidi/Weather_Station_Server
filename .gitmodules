@@ -1,6 +1,6 @@
-[submodule "Lib_TCP_UDP_Server"]
-	path = Lib_TCP_UDP_Server
-	url = http://192.168.109.15/root/Lib_TCP_UDP_Server.git
 [submodule "Lib_TCP_UDP_Client"]
 	path = Lib_TCP_UDP_Client
 	url = http://192.168.109.15/root/Lib_TCP_UDP_Client.git
+[submodule "Lib_TCP_UDP_Server"]
+	path = Lib_TCP_UDP_Server
+	url = http://192.168.109.15/root/Lib_TCP_UDP_Server.git
