@@ -27,8 +27,8 @@ void Client::execute()
         while (!data.empty()) {
             try {
                 _client.connecting();
-            } catch (const std::exception& e) {
-                std::cout << "error: client connecting" << '\n';
+            } catch (...) {
+                std::cerr << "error: client connecting" << '\n';
                 std::this_thread::sleep_for(std::chrono::milliseconds(_timeoutReset));
             }
 
@@ -36,8 +36,8 @@ void Client::execute()
             try {
                 _client.send(data);
                 data.clear();
-            } catch (const std::exception& e) {
-                std::cout << "error: client send" << '\n';
+            } catch (...) {
+                std::cerr << "error: client send" << '\n';
                 countErr++;
                 std::this_thread::sleep_for(std::chrono::milliseconds(_timeoutReset));
             }

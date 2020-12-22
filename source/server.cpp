@@ -8,9 +8,9 @@ Server::Server(config::Net& config)
 {
     try {
         _server.start();
-    } catch (const std::exception& e) {
-        std::cout << "error: server init" << '\n';
-        throw e;
+    } catch (...) {
+        std::cerr << "error: server init" << '\n';
+        throw std::current_exception();
     }
 
     _thread = std::thread(&Server::execute, this);
@@ -32,8 +32,8 @@ void Server::restart()
         _server.stop();
         std::this_thread::sleep_for(std::chrono::milliseconds(_timeoutReset));
         _server.start();
-    } catch (const std::exception& e) {
-        std::cout << "error: server restart" << '\n';
+    } catch (...) {
+        std::cerr << "error: server restart" << '\n';
     }
 }
 
@@ -44,8 +44,8 @@ void Server::execute()
     while (true) {
         try {
             _server.accept();
-        } catch (const std::exception& e) {
-            std::cout << "error: server accept" << '\n';
+        } catch (...) {
+            std::cerr << "error: server accept" << '\n';
             restart();
             continue;
         }
@@ -53,8 +53,8 @@ void Server::execute()
         data.resize(_sizeBuffer);
         try {
             _server.receive(data, _sizeBuffer);
-        } catch (const std::exception& e) {
-            std::cout << "error: server receive" << '\n';
+        } catch (...) {
+            std::cerr << "error: server receive" << '\n';
         }
 
         if (!data.empty()) {

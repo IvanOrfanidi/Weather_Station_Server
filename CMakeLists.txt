@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(weather-station-server VERSION 1.0.11)
+project(weather-station-server VERSION 1.0.12)
 
 configure_file(
     project_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/project_version.h
@@ -71,6 +71,3 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE wsock32 ws2_32)
     set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
 endif()
-
-# Link target
-target_link_libraries(${PROJECT_NAME})

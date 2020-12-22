@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     try {
         // Главный цикл выполнения
         handler.execute();
-    } catch (const std::exception& e) {
+    } catch (...) {
         return EXIT_FAILURE;
     }
 
