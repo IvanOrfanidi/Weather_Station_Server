@@ -14,8 +14,8 @@ public:
             std::string value;
             bool ready = false;
         };
-        static constexpr size_t MAX_NUM_FIELD = 8;
-        std::array<Value, MAX_NUM_FIELD> field;
+        static constexpr size_t MAX_NUMBER_OF_FIELDS = 8;
+        std::array<Value, MAX_NUMBER_OF_FIELDS> field;
     };
 
     Handler(Server& server,

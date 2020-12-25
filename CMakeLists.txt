@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(weather-station-server VERSION 1.0.12)
+project(weather-station-server VERSION 1.0.13)
 
 configure_file(
     project_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/project_version.h
@@ -59,6 +59,23 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+# Find boost
+if(WIN32)
+    find_package(Boost)
+elseif(UNIX)
+    # Boost components
+    set(BOOST_COMPONENTS
+        system
+        filesystem
+        date_time
+        chrono
+        serialization
+    )
+    find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+endif()
+
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
 if(UNIX)
     target_link_libraries(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/build/tcp_udp_server/lib/lib_tcp_udp_server.a")

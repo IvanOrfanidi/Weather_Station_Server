@@ -1,5 +1,8 @@
 #include <include/config.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
+
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -36,21 +39,15 @@ void Config::openConfigFile(const char* nameFile, config::Net& server, config::N
         throw std::runtime_error(error_message::OPEN_CONFIG_FILE);
     }
 
-    auto index = 0;
-    const std::string DELIMITER = ";";
+    size_t index = 0;
     std::string line;
     while (std::getline(file, line)) {
         std::cout << "<" << line << ">" << std::endl;
 
-        size_t pos = 0;
         std::vector<std::string> token;
-        while ((pos = line.find(DELIMITER)) != std::string::npos) {
-            token.push_back(line.substr(0, pos));
-            line.erase(0, pos + DELIMITER.length());
-        }
+        boost::split(token, line, boost::is_any_of(TOKEN_FINDER));
 
-        constexpr size_t NUMBER_CONFIG = 4;
-        if (token.size() == NUMBER_CONFIG) {
+        if (token.size() == NUMBER_CONFIG + 1) {
             config::Net configuration;
             if (*token[0].begin() != '#') {
                 configuration.addr = token[0];
@@ -67,10 +64,10 @@ void Config::openConfigFile(const char* nameFile, config::Net& server, config::N
 
             if (configuration.addr.length() != 0 && configuration.port != 0 && configuration.sizeBuffer != 0 && configuration.timeoutReset != 0) {
                 switch (index) {
-                case 0:
+                case ConfigIndex::SERVER:
                     server = configuration;
                     break;
-                case 1:
+                case ConfigIndex::CLIENT:
                     client = configuration;
                     break;
                 default:
@@ -85,8 +82,7 @@ void Config::openConfigFile(const char* nameFile, config::Net& server, config::N
     }
 
     file.close();
-    constexpr auto VALID_INDEX = 2;
-    if (index != VALID_INDEX) {
+    if (index != ConfigIndex::END) {
         throw std::runtime_error(error_message::CONFIG_IN_FILE);
     }
 }
@@ -99,19 +95,14 @@ void Config::openServerFile(const char* nameFile, std::vector<config::Server>& c
         throw std::runtime_error(error_message::OPEN_SERVER_FILE);
     }
 
-    const std::string DELIMITER = ";";
     std::string line;
     while (std::getline(file, line)) {
         std::cout << "<" << line << ">" << std::endl;
 
-        size_t pos = 0;
         std::vector<std::string> token;
-        while ((pos = line.find(DELIMITER)) != std::string::npos) {
-            token.push_back(line.substr(0, pos));
-            line.erase(0, pos + DELIMITER.length());
-        }
-        constexpr size_t NUMBER_SERVER_CONFIG = 3;
-        if (token.size() == NUMBER_SERVER_CONFIG) {
+        boost::split(token, line, boost::is_any_of(TOKEN_FINDER));
+
+        if (token.size() == NUMBER_SERVER_CONFIG + 1) {
             config::Server configuration;
             if (*token[0].begin() != '#') {
                 configuration.key = token[0];
@@ -146,19 +137,14 @@ void Config::openClientFile(const char* nameFile, std::vector<config::Client>& c
         throw std::runtime_error(error_message::OPEN_CLIENT_FILE);
     }
 
-    constexpr std::string_view DELIMITER = ";";
     std::string line;
     while (std::getline(file, line)) {
         std::cout << "<" << line << ">" << std::endl;
 
-        size_t pos = 0;
         std::vector<std::string> token;
-        while ((pos = line.find(DELIMITER)) != std::string::npos) {
-            token.push_back(line.substr(0, pos));
-            line.erase(0, pos + DELIMITER.length());
-        }
-        constexpr size_t NUMBER_CLIENT_CONFIG = 4;
-        if (token.size() == NUMBER_CLIENT_CONFIG) {
+        boost::split(token, line, boost::is_any_of(TOKEN_FINDER));
+
+        if (token.size() == NUMBER_CLIENT_CONFIG + 1) {
             config::Client configuration;
             if (*token[0].begin() != '#') {
                 configuration.sourceKey = token[0];
@@ -218,7 +204,7 @@ size_t Config::getSizeBuffer() const noexcept
 std::string Config::getCurrentWorkDir() const
 {
     std::string path;
-    constexpr size_t PATH_SIZE = 1024;
+    static constexpr size_t PATH_SIZE = 1024;
     path.resize(PATH_SIZE);
 #if defined(__unix__)
     size_t pos = readlink("/proc/self/exe", path.data(), PATH_SIZE);

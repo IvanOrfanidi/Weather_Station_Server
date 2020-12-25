@@ -1,4 +1,6 @@
 
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <cassert>
 #include <chrono>
 #include <cstring>
@@ -62,33 +64,34 @@ void Handler::parserData(std::vector<Data>& dest,
     const std::vector<config::Server>& serverConfig,
     const std::vector<config::Client>& clientConfig)
 {
+    // Пример данных для парсера:
+    // GET /update?key=2HKRRIJY64C0IPCP&field1=1&field2=2&field3=3&field4=4&field5=5&field6=6&field7=7&field8=8\r\n
     std::string stringForParser(src.begin(), src.end());
 
+    // Выделяем ключ ("key=2HKRRIJY64C0IPCP")
     std::string key;
     size_t pos = 0;
-    constexpr std::string_view START_OF_MESSAGE = "GET /update?key=";
-    if ((pos = stringForParser.find(START_OF_MESSAGE.data())) != std::string::npos) {
-        constexpr size_t SIZE_KEY_STRING = 16;
-        key = stringForParser.substr(pos + START_OF_MESSAGE.length(), pos + SIZE_KEY_STRING);
+    static constexpr std::string_view HEADER = "GET /update?key=";
+    if ((pos = stringForParser.find(HEADER.data())) != std::string::npos) {
+        static constexpr size_t SIZE_KEY_STRING = 16;
+        key = stringForParser.substr(pos + HEADER.length(), pos + SIZE_KEY_STRING);
     }
 
-    constexpr std::string_view DELIMITER = "&";
-    stringForParser.erase(0, key.length() + START_OF_MESSAGE.length() + DELIMITER.length());
-    std::string field;
-    std::vector<std::string> token;
-    while ((pos = stringForParser.find(DELIMITER)) != std::string::npos) {
-        field = stringForParser.substr(0, pos);
-        token.push_back(field);
-        stringForParser.erase(0, pos + DELIMITER.length());
-    }
-    if ((pos = stringForParser.find("\r\n")) != std::string::npos) {
-        field = stringForParser.substr(0, pos);
-        token.push_back(field);
-    }
+    // Удаляем заголовок и ключ из сообщения ("field2=2&field3=3&field4=4&field5=5&field6=6&field7=7&field8=8\r\n")
+    static constexpr std::string_view FIELDS_FINDER = "&";
+    boost::erase_all(stringForParser, HEADER.data() + key + FIELDS_FINDER.data());
+
+    // Выделяем поля со значениями("field1=1", "field2=2" ...)
+    std::vector<std::string> fields;
+    fields.reserve(Data::MAX_NUMBER_OF_FIELDS);
+    boost::split(fields, stringForParser, boost::is_any_of(FIELDS_FINDER));
+
+    // Удаляем из последнего поля символы завершения сообщения CR LF ("field8=8\r\n")
+    boost::erase_all(fields.back(), "\r\n");
 
     // Выделяем чистые данные без имен полей
     std::vector<std::string> value;
-    getValues(value, token);
+    getValues(value, fields);
 
     // Передаем данные серверам
     for (const auto& client : clientConfig) {
@@ -180,8 +183,8 @@ void Handler::outInfo(const std::vector<char>& data) const
 void Handler::getValues(std::vector<std::string>& value,
     const std::vector<std::string>& token)
 {
-    value.reserve(Data::MAX_NUM_FIELD);
-    value.resize(Data::MAX_NUM_FIELD);
+    value.reserve(Data::MAX_NUMBER_OF_FIELDS);
+    value.resize(Data::MAX_NUMBER_OF_FIELDS);
     const std::vector<std::string> tokenFields{
         "field1=",
         "field2=",

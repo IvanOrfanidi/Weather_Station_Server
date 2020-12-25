@@ -50,6 +50,19 @@ public:
     static constexpr std::string_view NAME_CLIENT_CONFIGURATION_FILE = "client.cfg";
 
 private:
+    enum ConfigIndex : size_t {
+        SERVER = 0,
+        CLIENT = 1,
+
+        END
+    };
+
+    static constexpr std::string_view TOKEN_FINDER = ";";
+
+    static constexpr size_t NUMBER_CONFIG = 4;
+    static constexpr size_t NUMBER_SERVER_CONFIG = 3;
+    static constexpr size_t NUMBER_CLIENT_CONFIG = 4;
+
     void openConfigFile(const char* nameFile, config::Net& server, config::Net& client);
 
     void openServerFile(const char* nameFile, std::vector<config::Server>& config);
