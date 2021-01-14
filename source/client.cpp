@@ -34,7 +34,7 @@ void Client::execute()
 
             // Отправляем данные и принимаем подтверждение
             try {
-                _client.send(data);
+                _client.sendData(data);
                 data.clear();
             } catch (...) {
                 std::cerr << "error: client send" << '\n';

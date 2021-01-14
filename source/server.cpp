@@ -43,7 +43,7 @@ void Server::execute()
     data.reserve(_sizeBuffer);
     while (true) {
         try {
-            _server.accept();
+            _server.acceptSocket();
         } catch (...) {
             std::cerr << "error: server accept" << '\n';
             restart();
@@ -52,7 +52,7 @@ void Server::execute()
 
         data.resize(_sizeBuffer);
         try {
-            _server.receive(data, _sizeBuffer);
+            _server.receiveData(data, _sizeBuffer);
         } catch (...) {
             std::cerr << "error: server receive" << '\n';
         }
