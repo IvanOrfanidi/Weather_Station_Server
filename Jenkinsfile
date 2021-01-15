@@ -1,7 +1,12 @@
-// Имя выходного файла
+// Name of the executable file
 def EXECUTABLE_FILE_NAME = "weather-station-server"
+def CONFIGURATION_FILE_NAME = "configuration_of_weather_station_server"
 
-// Версия программы
+def LOGIN = "pi"
+def SERVER = "192.168.109.25"
+def PATH = "Weather_Station_Server/build"
+
+// Program version
 def VERSION = ""
 
 pipeline {
@@ -44,14 +49,34 @@ pipeline {
             }
         }
 
+        stage('download configuration')
+        {
+            steps {
+                script {
+                    sh "rm -rf ${CONFIGURATION_FILE_NAME}"
+                    sh "git clone http://192.168.109.15/root/${CONFIGURATION_FILE_NAME}.git"
+                }
+            }
+        }
+
         stage('archive') {
             steps {
                 script {
                     VERSION = sh( returnStdout: true, script: "build/${EXECUTABLE_FILE_NAME} -v" ).trim()
-                    sh 'git clone http://192.168.109.15/root/configuration_of_weather_station_server.git'
-                    sh 'mkdir build/config'
-                    sh 'cp -r configuration_of_weather_station_server/*.cfg build/config/'
+                    sh "rm -rf build/config && mkdir build/config"
+                    sh "cp -r ${CONFIGURATION_FILE_NAME}/*.cfg build/config/"
                     sh "zip build/${EXECUTABLE_FILE_NAME}-${VERSION}.zip build/${EXECUTABLE_FILE_NAME}.exe build/${EXECUTABLE_FILE_NAME} build/config/*.cfg"
+                }
+            }
+        }
+
+        stage('copy to server') {
+            steps {
+                script {
+                    // Copying an executable file
+                    sh "scp build/${EXECUTABLE_FILE_NAME} ${LOGIN}@${SERVER}:/home/${LOGIN}/${PATH}"
+                    // Copying configuration files
+                    sh "scp -r build/config ${LOGIN}@${SERVER}:/home/${LOGIN}/${PATH}/"
                 }
             }
         }
@@ -69,7 +94,6 @@ pipeline {
         }
     }
     options {
-        // Хранить только одну удачную сбороку
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
 }
