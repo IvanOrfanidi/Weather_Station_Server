@@ -3,7 +3,7 @@ def EXECUTABLE_FILE_NAME = "weather-station-server"
 def CONFIGURATION_FILE_NAME = "configuration_of_weather_station_server"
 
 def LOGIN = "pi"
-def SERVER = "192.168.109.25"
+def SERVER = "pijenkins.home.lan"
 def PATH = "Weather_Station_Server/build"
 
 // Program version
@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     sh "rm -rf ${CONFIGURATION_FILE_NAME}"
-                    sh "git clone http://192.168.109.15/root/${CONFIGURATION_FILE_NAME}.git"
+                    sh "git clone http://git.home.lan/root/${CONFIGURATION_FILE_NAME}.git"
                 }
             }
         }

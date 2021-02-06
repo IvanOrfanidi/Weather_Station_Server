@@ -7,7 +7,7 @@ build:
   after_script:
   - cd /media/storage/gitlab/
   - sudo rm -rf Weather_Station_Server
-  - git clone http://192.168.109.15/root/Weather_Station_Server.git
+  - git clone http://git.home.lan/root/Weather_Station_Server.git
   - cd Weather_Station_Server
   - git submodule init
   - git submodule update
