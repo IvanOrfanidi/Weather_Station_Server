@@ -33,7 +33,7 @@ pipeline {
 
         stage('cppcheck') {
             steps {
-                sh 'cppcheck --enable=all --xml --xml-version=2 -i ext  source include 2> build/cppcheck.xml'
+                sh 'cppcheck --language=c++ -Iinclude --enable=all --xml --xml-version=2 -i ext  source include 2> build/cppcheck.xml'
                 sh 'cppcheck-htmlreport --source-encoding="iso8859-1" --title="project" --source-dir=. --report-dir=build --file=build/cppcheck.xml'
                 publishHTML(
                     target: [
